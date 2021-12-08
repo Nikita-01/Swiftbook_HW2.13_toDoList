@@ -84,6 +84,23 @@ class TaskListViewController: UITableViewController {
         present(alert, animated: true)
     }
     
+    private func showUpdateAlert(with title: String, and message: String, selectedTask: Task) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
+            guard let task = alert.textFields?.first?.text, !task.isEmpty else { return }
+            self.update(taskName: task, task: selectedTask)
+            self.tableView.reloadData()
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+        alert.addAction(saveAction)
+        alert.addAction(cancelAction)
+        alert.addTextField { textField in
+            textField.placeholder = "New Task"
+            textField.text = selectedTask.title
+        }
+        present(alert, animated: true)
+    }
+    
     private func save(_ taskName: String) {
         let task = Task(context: context)
         task.title = taskName
@@ -95,8 +112,7 @@ class TaskListViewController: UITableViewController {
         StorageManager.shared.save(context: context)
     }
     
-    private func update(taskName: String) {
-        let task = Task(context: context)
+    private func update(taskName: String, task: Task) {
         task.title = taskName
         
         StorageManager.shared.save(context: context)
@@ -128,8 +144,8 @@ extension TaskListViewController {
         return swipeActions
     }
     
-//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let task = taskList[indexPath.row]
-//        showAlert(with: "Update Task", and: "What do you want to do?")
-//    }
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let task = taskList[indexPath.row]
+        showUpdateAlert(with: "Update task", and: "What do you whont to do?", selectedTask: task)
+    }
 }
